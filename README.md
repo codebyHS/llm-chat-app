@@ -1,46 +1,106 @@
-# Getting Started with Create React App
+# AI Chat App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A local AI chat application built with React and TypeScript, powered by [Ollama](https://ollama.com). Chat with a large language model entirely on your machine — no API key, no internet connection, no cost.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## What It Does
 
-### `npm start`
+- Real-time chat interface with user and assistant message bubbles
+- Animated loading indicator while the model is thinking
+- Full conversation history sent with each message for context-aware replies
+- Error handling if Ollama is unreachable
+- Keyboard shortcut — press **Enter** to send
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+---
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, TypeScript |
+| Styling | Plain CSS |
+| AI Backend | Ollama (llama3.2, runs locally) |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Project Structure
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+src/
+├── components/
+│   ├── Header.tsx           # App title bar
+│   ├── ChatWindow.tsx       # Scrollable message list
+│   ├── MessageBubble.tsx    # User / assistant chat bubbles
+│   ├── LoadingIndicator.tsx # Animated dots while waiting
+│   └── InputBar.tsx         # Text input + Send button
+├── lib/
+│   └── llm.ts               # Ollama API call
+├── App.tsx                  # Root component + state
+└── App.css                  # Global styles
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Prerequisites
 
-### `npm run eject`
+- [Node.js](https://nodejs.org) v16+
+- [Ollama](https://ollama.com) installed on your machine
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+---
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## How to Run Locally
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 1. Clone the repository
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+git clone https://github.com/codebyHS/llm-chat-app.git
+cd llm-chat-app
+```
 
-## Learn More
+### 2. Install dependencies
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm install
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 3. Install and start Ollama
+
+Download Ollama from [ollama.com](https://ollama.com), then pull the model:
+
+```bash
+ollama pull llama3.2
+```
+
+Ollama runs automatically in the background after installation. To start it manually:
+
+```bash
+OLLAMA_ORIGINS="http://localhost:3000" ollama serve
+```
+
+> The `OLLAMA_ORIGINS` flag allows the React dev server to communicate with Ollama.
+
+### 4. Start the React app
+
+```bash
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## How It Works
+
+1. User types a message and hits **Send** or **Enter**
+2. The full conversation history is sent to the local Ollama API at `http://localhost:11434/api/generate`
+3. Ollama runs `llama3.2` locally and returns a response
+4. The response appears in the chat as an assistant message
+
+To swap in a different model, change the model name in `src/lib/llm.ts`:
+
+```ts
+body: JSON.stringify({ model: "llama3.2", prompt, stream: false }),
+```
+
+Any model available via `ollama list` can be used.
